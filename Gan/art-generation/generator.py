@@ -1,0 +1,72 @@
+import torch
+from torch import nn
+import torchvision
+
+from torch.nn import Module
+from torch.nn import Conv2d
+from torch.nn import ReLU
+from torch.nn import Tanh
+from torch.nn import ConvTranspose2d
+from torch.nn import BatchNorm2d
+
+from prettytable import PrettyTable
+
+
+class Generator(Module):
+    def __init__(self):
+        super(Generator, self).__init__()
+
+        self.conv1 = Conv2d(in_channels=1024, out_channels=512,
+                            kernel_size=(3, 3), stride=0.5)
+        self.bn1 = BatchNorm2d(num_features=512)
+        self.relu1 = ReLU()
+
+        self.conv2 = Conv2d(in_channels=512, out_channels=256,
+                            kernel_size=(3, 3), stride=0.5)
+        self.bn2 = BatchNorm2d(num_features=256)
+        self.relu2 = ReLU()
+
+        self.conv3 = Conv2d(in_channels=256, out_channels=128,
+                            kernel_size=(3, 3), stride=0.5)
+        self.bn3 = BatchNorm2d(num_features=128)
+        self.relu3 = ReLU()
+
+        self.conv4 = Conv2d(in_channels=128, out_channels=3,
+                            kernel_size=(3, 3), stride=0.5)
+        self.tanh = Tanh()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu1(x)
+
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.relu2(x)
+
+        x = self.conv3(x)
+        x = self.bn3(x)
+        x = self.relu3(x)
+
+        x = self.conv4(x)
+        x = self.tanh(x)
+
+        return x
+
+
+def count_parameters(model):
+    table = PrettyTable(['Modules', 'Parameters'])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad:
+            continue
+        params = parameter.numel()
+        table.add_row([name, params])
+        total_params += params
+    print(table)
+    print(f'Total Trainable Params: {total_params}')
+    return total_params
+
+
+model = Generator()
+count_parameters(model)
