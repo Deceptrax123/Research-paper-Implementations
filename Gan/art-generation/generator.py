@@ -30,23 +30,23 @@ class Generator(Module):
         self.linear=Linear(in_features=100,out_features=16384)
         self.reshape=Reshape(shape=(1024,4,4))
 
-        self.conv1 = Conv2d(in_channels=1024, out_channels=512,
-                            kernel_size=(3, 3), stride=0.5)
+        self.conv1 = ConvTranspose2d(in_channels=1024, out_channels=512,
+                            kernel_size=(3, 3), stride=2)
         self.bn1 = BatchNorm2d(num_features=512)
         self.relu1 = ReLU()
 
-        self.conv2 = Conv2d(in_channels=512, out_channels=256,
-                            kernel_size=(3, 3), stride=0.5)
+        self.conv2 = ConvTranspose2d(in_channels=512, out_channels=256,
+                            kernel_size=(3, 3), stride=2)
         self.bn2 = BatchNorm2d(num_features=256)
         self.relu2 = ReLU()
 
-        self.conv3 = Conv2d(in_channels=256, out_channels=128,
-                            kernel_size=(3, 3), stride=0.5)
+        self.conv3 = ConvTranspose2d(in_channels=256, out_channels=128,
+                            kernel_size=(3, 3), stride=2)
         self.bn3 = BatchNorm2d(num_features=128)
         self.relu3 = ReLU()
 
-        self.conv4 = Conv2d(in_channels=128, out_channels=3,
-                            kernel_size=(3, 3), stride=0.5)
+        self.conv4 = ConvTranspose2d(in_channels=128, out_channels=3,
+                            kernel_size=(3, 3), stride=2)
         self.tanh = Tanh()
 
     def forward(self, x):
