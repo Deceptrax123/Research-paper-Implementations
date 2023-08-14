@@ -7,14 +7,28 @@ from torch.nn import Conv2d
 from torch.nn import ReLU
 from torch.nn import Tanh
 from torch.nn import ConvTranspose2d
-from torch.nn import BatchNorm2d
+from torch.nn import BatchNorm2d,Linear,Flatten
 
 from prettytable import PrettyTable
+from torchsummary import summary
 
+
+class Reshape(nn.Module):
+    def __init__(self, shape):
+        super().__init__()
+        self.shape = shape
+
+    def forward(self, x):
+        return torch.reshape(x, self.shape)
+    
 
 class Generator(Module):
     def __init__(self):
         super(Generator, self).__init__()
+
+        #project noise of latent space to a 4d stack
+        self.linear=Linear(in_features=100,out_features=16384)
+        self.reshape=Reshape(shape=(1024,4,4))
 
         self.conv1 = Conv2d(in_channels=1024, out_channels=512,
                             kernel_size=(3, 3), stride=0.5)
@@ -36,9 +50,12 @@ class Generator(Module):
         self.tanh = Tanh()
 
     def forward(self, x):
+        x=self.linear(x)
+        x=self.reshape(x)
+
         x = self.conv1(x)
         x = self.bn1(x)
-        x = self.relu1(x)
+        x= self.relu1(x)
 
         x = self.conv2(x)
         x = self.bn2(x)
