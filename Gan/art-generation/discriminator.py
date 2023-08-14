@@ -11,23 +11,23 @@ class Discriminator(Module):
     def __init__(self):
         super(Discriminator,self).__init__()
 
-        self.conv1=Conv2d(in_channels=3,out_channels=8,stride=2,kernel_size=(3,3),padding='valid')
+        self.conv1=Conv2d(in_channels=3,out_channels=8,stride=2,kernel_size=(3,3),padding=1)
         self.lr1=LeakyReLU(negative_slope=0.2)
 
-        self.conv2=Conv2d(in_channels=8,out_channels=16,stride=2,kernel_size=(3,3),padding='valid')
+        self.conv2=Conv2d(in_channels=8,out_channels=16,stride=2,kernel_size=(3,3),padding=1)
         self.bn2=BatchNorm2d(num_features=16)
         self.lr2=LeakyReLU(negative_slope=0.2)
 
-        self.conv3=Conv2d(in_channels=16,out_channels=32,kernel_size=(3,3),stride=2,padding='valid')
+        self.conv3=Conv2d(in_channels=16,out_channels=32,kernel_size=(3,3),stride=2,padding=1)
         self.bn3=BatchNorm2d(32)
         self.lr3=LeakyReLU(negative_slope=0.2)
 
-        self.conv4=Conv2d(in_channels=32,out_channels=64,kernel_size=(3,3),stride=2,padding='valid')
+        self.conv4=Conv2d(in_channels=32,out_channels=64,kernel_size=(3,3),stride=2,padding=1)
         self.bn4=BatchNorm2d(64)
         self.lr4=LeakyReLU(negative_slope=0.2)
 
         self.flatten=Flatten(start_dim=1)
-        self.linear=Linear(576,1)
+        self.linear=Linear(4096,1)
 
         self.sigmoid=Sigmoid()
     
@@ -53,21 +53,21 @@ class Discriminator(Module):
 
         return x
 
-def count_parameters(model):
-    table = PrettyTable(['Modules', 'Parameters'])
-    total_params = 0
-    for name, parameter in model.named_parameters():
-        if not parameter.requires_grad:
-            continue
-        params = parameter.numel()
-        table.add_row([name, params])
-        total_params += params
-    print(table)
-    print(f'Total Trainable Params: {total_params}')
-    return total_params
+# def count_parameters(model):
+#     table = PrettyTable(['Modules', 'Parameters'])
+#     total_params = 0
+#     for name, parameter in model.named_parameters():
+#         if not parameter.requires_grad:
+#             continue
+#         params = parameter.numel()
+#         table.add_row([name, params])
+#         total_params += params
+#     print(table)
+#     print(f'Total Trainable Params: {total_params}')
+#     return total_params
 
 
 model = Discriminator()
-count_parameters(model)
+# count_parameters(model)
 
-summary(model,input_size=(3,64,64),batch_size=1,device='cpu')
+# summary(model,input_size=(3,128,128),batch_size=1,device='cpu')

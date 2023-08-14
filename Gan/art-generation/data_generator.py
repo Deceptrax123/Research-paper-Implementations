@@ -25,7 +25,7 @@ class Dataset(torch.utils.data.Dataset):
         mean,std=sa.mean([1,2]),sa.std([1,2])
 
         #Composed transform
-        composed_transforms=T.Compose([T.Resize(size=(128,128)),T.ToTensor(),T.Normalize(mean=mean,std=std)])
+        composed_transforms=T.Compose([T.Resize(size=(64,64)),T.ToTensor(),T.Normalize(mean=mean,std=std)])
 
         sample=composed_transforms(sample)
 

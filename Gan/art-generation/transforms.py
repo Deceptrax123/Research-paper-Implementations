@@ -1,27 +1,28 @@
 import torch 
 import torchvision 
 import torchvision.transforms as T 
-import matplotlib.pyplot as plt 
-import numpy as np 
-
-from PIL import Image 
-
-
-img=Image.open("./Data/Abstract_gallery/Abstract_gallery/Abstract_image_431.jpg")
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
 
 
+#experiement python file
+sample = Image.open(
+            "./Data/Abstract_gallery/Abstract_gallery/Abstract_image_"+str(2766)+".jpg")
+
+#initial transform
 tensor=T.ToTensor()
-i=tensor(img)
+sa=tensor(sample)
 
-print(i.shape)
+mean,std=sa.mean([1,2]),sa.std([1,2])
 
-mean,std=i.mean([1,2],keepdim=True),i.std([1,2],keepdim=True)
+#Composed transform
+composed_transforms=T.Compose([T.Resize(size=(128,128)),T.ToTensor(),T.Normalize(mean=mean,std=std)])
 
-composed=T.Compose([T.Resize(size=(128,128)),T.ToTensor(),T.Normalize(mean=mean,std=std)])
-img_norm=composed(img)
+sample=composed_transforms(sample)
 
-img_norm=np.array(img_norm)
-img_norm=img_norm.transpose(1,2,0)
+sample=np.array(sample)
+sample=sample.transpose(1,2,0)
 
-plt.imshow(img_norm)
+plt.imshow(sample)
 plt.show()
