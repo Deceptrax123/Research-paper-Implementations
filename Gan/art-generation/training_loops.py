@@ -34,7 +34,7 @@ def train_step():
         discriminator.zero_grad()
         discriminator_predictions=discriminator(samples)
         discriminator_loss=loss_function(discriminator_predictions,labels)
-        discriminator_loss.backward()
+        discriminator_loss.backward(retain_graph=True)
         discriminator_optimizer.step()
 
         #Training the generator

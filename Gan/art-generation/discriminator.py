@@ -93,6 +93,6 @@ class Discriminator(Module):
 #     return total_params
 
 
-model = Discriminator()
+#model = Discriminator()
 # # # # # count_parameters(model)
-summary(model,input_size=(3,256,256),batch_size=8,device='cpu')
+# summary(model,input_size=(3,256,256),batch_size=8,device='cpu')
