@@ -65,7 +65,7 @@ def test_step():
         real_labels=torch.ones((real_samples.size(0),1)).to(device=device)
 
         #generate samples in latent space
-        latent_space_samples=torch.randn((real_samples.size(0),1)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
         generated_labels=torch.zeros((real_samples.size(0),1)).to(device=device)
@@ -79,7 +79,7 @@ def test_step():
         loss_discriminator=loss_function(discriminator_output,labels)
 
         #get generator loss
-        latent_space_samples=torch.randn((real_samples.size(0),1)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
         discriminator_generated=discriminator(generated_samples)
@@ -106,9 +106,9 @@ def training_loop():
 
         test_losses=test_step()
         
-        print("Epoch { }".format(epoch+1))
-        print("Generator Loss: Train - {} Test- {}".format(train_losses[0],train_losses[1]))
-        print("Discriminator Loss: Train - {} Test-{}".format(test_losses[0],test_losses[1]))
+        print('Epoch {epoch}'.format(epoch=epoch+1))
+        print("Generator Loss: Train - {gen} Test- {dis}".format(gen=train_losses[0],dis=train_losses[1]))
+        print("Discriminator Loss: Train - {gen} Test-{dis}".format(gen=test_losses[0],dis=test_losses[1]))
 
 if __name__=='__main__':
     #initial setup
@@ -132,7 +132,6 @@ if __name__=='__main__':
         device=torch.device("mps")
     else:
         device=torch.device("cpu")
-
     #get the models
     generator=Generator().to(device=device)
     discriminator=Discriminator().to(device=device)
