@@ -7,21 +7,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch import nn
+from time import time
+import multiprocessing as mp
 
 
-def train():
+def train_step():
     gen_loss=0
     dis_loss=0
     for step,data in enumerate(train_loader):
         #generate the labels
         real_samples=data.to(device=device)
-        real_labels=torch.ones((params['batch_size'],1)).to(device=device)
+        real_labels=torch.ones((real_samples.size(0),1)).to(device=device)
 
         #generate latent space noise
-        latent_space_samples=torch.randn((params['batch_size'],100)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
-        generated_labels=torch.zeros((params['batch_size'],1)).to(device=device)
+        generated_labels=torch.zeros((real_samples.size(0),1)).to(device=device)
 
         #consider all samples
         samples=torch.cat((real_samples,generated_samples))
@@ -36,7 +38,7 @@ def train():
         discriminator_optimizer.step()
 
         #Training the generator
-        latent_space_samples=torch.randn((params['batch_size'],100)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generator.zero_grad()
 
         generated_samples=generator(latent_space_samples)
@@ -48,25 +50,25 @@ def train():
         gen_loss+=generator_loss.item()
         dis_loss+=discriminator_loss.item()
 
-        if step==params['batch_size']-1:
+        if step==train_steps-1:
             gen_loss=gen_loss/(step+1)
             dis_loss=dis_loss/(step+1)
 
     return gen_loss,dis_loss
 
-def test():
+def test_step():
     gen_loss=0
     dis_loss=0
 
     for step,data in enumerate(test_loader):
         real_samples=data.to(device=device)
-        real_labels=torch.ones((params['batch_size'],1)).to(device=device)
+        real_labels=torch.ones((real_samples.size(0),1)).to(device=device)
 
         #generate samples in latent space
-        latent_space_samples=torch.randn((params['batch_size'],1)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),1)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
-        generated_labels=torch.zeros((params['batch_size'],1)).to(device=device)
+        generated_labels=torch.zeros((real_samples.size(0),1)).to(device=device)
 
         #consider all samples for discriminator loss
         samples=torch.cat((real_samples,generated_samples))
@@ -77,7 +79,7 @@ def test():
         loss_discriminator=loss_function(discriminator_output,labels)
 
         #get generator loss
-        latent_space_samples=torch.randn((params['batch_size'],1)).to(device=device)
+        latent_space_samples=torch.randn((real_samples.size(0),1)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
         discriminator_generated=discriminator(generated_samples)
@@ -86,7 +88,7 @@ def test():
         gen_loss+=loss_generator.item()
         dis_loss+=loss_discriminator.item()
 
-        if step==params['batch_size']-1:
+        if (step==test_steps-1):
             gen_loss=gen_loss/(step+1)
             dis_loss=dis_loss/(step+1)
     return gen_loss,dis_loss
@@ -97,52 +99,64 @@ def training_loop():
         generator.train(True)
         discriminator.train(True)
 
-        gen_train_loss,dis_train_loss=train()
+        train_losses=train_step()
 
         generator.eval()
         discriminator.eval()
 
-        gen_test_loss,dis_test_loss=test()
+        test_losses=test_step()
         
         print("Epoch { }".format(epoch+1))
-        print("Generator Loss: Train - {} Test- {}".format(gen_train_loss,gen_test_loss))
-        print("Discriminator Loss: Train - {} Test-{}".format(dis_train_loss,dis_test_loss))
+        print("Generator Loss: Train - {} Test- {}".format(train_losses[0],train_losses[1]))
+        print("Discriminator Loss: Train - {} Test-{}".format(test_losses[0],test_losses[1]))
+
+if __name__=='__main__':
+    #initial setup
+    ids = list(range(0, 2782))
+    train,test=train_test_split(ids,test_size=0.25)
+
+    params={
+        'batch_size':8,
+        'shuffle':True,
+        'num_workers':4
+    }
+
+    train_dataset=Dataset(train)
+    test_dataset=Dataset(test)
+
+    train_loader=DataLoader(train_dataset,**params)
+    test_loader=DataLoader(test_dataset,**params)
+
+    #device usage 
+    if torch.backends.mps.is_available():
+        device=torch.device("mps")
+    else:
+        device=torch.device("cpu")
+
+    #get the models
+    generator=Generator().to(device=device)
+    discriminator=Discriminator().to(device=device)
+
+    #hyperparameters
+    lr=0.0002
+    num_epochs=100
+    loss_function=nn.BCELoss()
+
+    #set optimizer
+    generator_optimizer=torch.optim.Adam(generator.parameters(),lr=lr,betas=(0.5,0.999))
+    discriminator_optimizer=torch.optim.Adam(discriminator.parameters(),lr=lr,betas=(0.5,0.999))
 
 
-#initial setup
-ids = list(range(0, 2782))
-train,test=train_test_split(ids,test_size=0.25)
+    train_steps=(len(train)+params['batch_size']-1)//params['batch_size']
+    test_steps=(len(test)+params['batch_size']-1)//params['batch_size']
 
-params={
-    'batch_size':8,
-    'shuffle':True,
-    'num_workers':1
-}
+    training_loop()
 
-train_dataset=Dataset(train)
-test_dataset=Dataset(test)
-
-train_loader=DataLoader(train_dataset,**params)
-test_loader=DataLoader(test_dataset,**params)
-
-#device usage 
-if torch.backends.mps.is_available():
-    device=torch.device("mps")
-else:
-    device=torch.device("cpu")
-
-#get the models
-generator=Generator().to(device=device)
-discriminator=Discriminator().to(device=device)
-
-#hyperparameters
-lr=0.0002
-num_epochs=100
-loss_function=nn.BCELoss()
-
-#set optimizer
-generator_optimizer=torch.optim.Adam(generator.parameters(),lr=lr,betas=(0.5,0.999))
-discriminator_optimizer=torch.optim.Adam(discriminator.parameters(),lr=lr,betas=(0.5,0.999))
-
-#train
-training_loop()
+    # for num_workers in range(2, mp.cpu_count()+2, 2):  
+    #     tloader = DataLoader(train_dataset,shuffle=True,num_workers=num_workers,batch_size=32,pin_memory=True)
+    #     start = time()
+    #     for epoch in range(1, 3):
+    #         for i, data in enumerate(tloader,0):
+    #             pass
+    #     end = time()
+    #     print("Finish with:{} second, num_workers={}".format(end - start, num_workers))

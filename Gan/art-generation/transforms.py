@@ -4,6 +4,7 @@ import torchvision.transforms as T
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+import os 
 
 
 #experiement python file
@@ -24,5 +25,8 @@ sample=composed_transforms(sample)
 sample=np.array(sample)
 sample=sample.transpose(1,2,0)
 
-plt.imshow(sample)
-plt.show()
+# plt.imshow(sample)
+# plt.show()
+
+#get cpu cores count
+print(os.cpu_count())
