@@ -41,7 +41,7 @@ class Discriminator(Module):
         self.lr6=LeakyReLU(negative_slope=0.2)
 
         self.flatten=Flatten(start_dim=1)
-        self.linear=Linear(64,1)
+        self.linear=Linear(256,1)
 
     
     def forward(self,x):
@@ -93,6 +93,6 @@ class Discriminator(Module):
 #     return total_params
 
 
-#model = Discriminator()
+model = Discriminator()
 # # # # # count_parameters(model)
-#summary(model,input_size=(3,128,128),batch_size=8,device='cpu')
+summary(model,input_size=(3,256,256),batch_size=8,device='cpu')
