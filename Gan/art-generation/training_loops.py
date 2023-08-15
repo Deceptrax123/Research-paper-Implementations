@@ -107,8 +107,8 @@ def training_loop():
         test_losses=test_step()
         
         print('Epoch {epoch}'.format(epoch=epoch+1))
-        print("Generator Loss: Train - {gen} Test- {dis}".format(gen=train_losses[0],dis=train_losses[1]))
-        print("Discriminator Loss: Train - {gen} Test-{dis}".format(gen=test_losses[0],dis=test_losses[1]))
+        print("Generator Loss: Train - {gen} Test- {dis}".format(gen=train_losses[0],dis=test_losses[0]))
+        print("Discriminator Loss: Train - {gen} Test-{dis}".format(gen=train_losses[1],dis=test_losses[1]))
 
 if __name__=='__main__':
     #initial setup
