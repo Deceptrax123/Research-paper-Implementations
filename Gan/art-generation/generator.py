@@ -20,30 +20,30 @@ class Generator(Module):
         self.linear=Linear(in_features=100,out_features=16384)
 
         self.conv1 = ConvTranspose2d(in_channels=1024, out_channels=512,
-                            kernel_size=(1, 1), stride=2,output_padding=1)
+                            kernel_size=(4, 4), stride=2,padding=1)
         self.bn1=BatchNorm2d(512)
         self.relu1 = ReLU()
 
         self.conv2 = ConvTranspose2d(in_channels=512, out_channels=256,
-                            kernel_size=(1, 1), stride=2,output_padding=1)
+                            kernel_size=(4, 4), stride=2,padding=1)
         self.bn2 = BatchNorm2d(num_features=256)
         self.relu2 = ReLU()
 
         self.conv3 = ConvTranspose2d(in_channels=256, out_channels=128,
-                            kernel_size=(1, 1), stride=2,output_padding=1)
+                            kernel_size=(4, 4), stride=2,padding=1)
         self.bn3 = BatchNorm2d(num_features=128)
         self.relu3 = ReLU()
 
         self.conv4 = ConvTranspose2d(in_channels=128, out_channels=64,
-                            kernel_size=(1, 1), stride=2,output_padding=1)
+                            kernel_size=(4, 4), stride=2,padding=1)
         self.bn4=BatchNorm2d(num_features=64)
         self.relu4=ReLU()
 
-        self.conv5=ConvTranspose2d(in_channels=64,out_channels=32,kernel_size=(1,1),stride=2,output_padding=1)
+        self.conv5=ConvTranspose2d(in_channels=64,out_channels=32,kernel_size=(4,4),stride=2,padding=1)
         self.bn5=BatchNorm2d(num_features=32)
         self.relu5=ReLU()
 
-        self.conv6=ConvTranspose2d(in_channels=32,out_channels=3,kernel_size=(1,1),stride=2,output_padding=1)
+        self.conv6=ConvTranspose2d(in_channels=32,out_channels=3,kernel_size=(4,4),stride=2,padding=1)
         self.tanh = Tanh()
 
     def forward(self, x):

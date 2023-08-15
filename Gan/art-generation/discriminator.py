@@ -12,6 +12,7 @@ class Discriminator(Module):
         super(Discriminator,self).__init__()
 
         self.conv1=Conv2d(in_channels=3,out_channels=8,stride=2,kernel_size=(3,3),padding=1)
+        self.bn1=BatchNorm2d(8)
         self.dp1=Dropout2d(p=0.3)
         self.lr1=LeakyReLU(negative_slope=0.2)
 
@@ -46,6 +47,7 @@ class Discriminator(Module):
     
     def forward(self,x):
         x=self.conv1(x)
+        x=self.bn1(x)
         x=self.dp1(x)
         x=self.lr1(x)
 

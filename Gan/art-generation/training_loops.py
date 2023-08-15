@@ -101,8 +101,8 @@ if __name__=='__main__':
     initialize_weights(discriminator)
 
     #hyperparameters
-    lr=0.0002
-    num_epochs=50
+    lr=2e-4
+    num_epochs=100
     loss_function=nn.BCEWithLogitsLoss()
 
     #set optimizer
