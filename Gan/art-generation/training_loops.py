@@ -6,6 +6,7 @@ from generator import Generator
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from initialize import initialize_weights
 from torch import nn
 from time import time
 import multiprocessing as mp
@@ -18,12 +19,12 @@ def train_step():
         #generate the labels
         real_samples=data.to(device=device)
         real_labels=torch.ones((real_samples.size(0),1)).to(device=device)
+        generated_labels=torch.zeros((real_samples.size(0),1)).to(device=device)
+
 
         #generate latent space noise
         latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
-
-        generated_labels=torch.zeros((real_samples.size(0),1)).to(device=device)
 
         #consider all samples
         samples=torch.cat((real_samples,generated_samples))
@@ -32,16 +33,12 @@ def train_step():
         #Train the discriminator
         discriminator.zero_grad()
         discriminator_predictions=discriminator(samples)
-
         discriminator_loss=loss_function(discriminator_predictions,labels)
         discriminator_loss.backward()
         discriminator_optimizer.step()
 
         #Training the generator
-        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generator.zero_grad()
-
-        generated_samples=generator(latent_space_samples)
         output_discriminator_generated=discriminator(generated_samples)
         generator_loss=loss_function(output_discriminator_generated,real_labels)
         generator_loss.backward()
@@ -49,12 +46,11 @@ def train_step():
 
         gen_loss+=generator_loss.item()
         dis_loss+=discriminator_loss.item()
+    
+    gloss=gen_loss/train_steps
+    dloss=dis_loss/train_steps
 
-        if step==train_steps-1:
-            gen_loss=gen_loss/(step+1)
-            dis_loss=dis_loss/(step+1)
-
-    return gen_loss,dis_loss
+    return gloss,dloss
 
 def training_loop():
 
@@ -101,6 +97,9 @@ if __name__=='__main__':
     generator=Generator().to(device=device)
     discriminator=Discriminator().to(device=device)
 
+    initialize_weights(generator)
+    initialize_weights(discriminator)
+
     #hyperparameters
     lr=0.0002
     num_epochs=50
@@ -127,3 +126,4 @@ if __name__=='__main__':
     #             pass
     #     end = time()
     #     print("Finish with:{} second, num_workers={}".format(end - start, num_workers))
+

@@ -19,13 +19,13 @@ class Dataset(torch.utils.data.Dataset):
             "./Data/Abstract_gallery/Abstract_gallery/Abstract_image_"+str(id)+".jpg")
 
         #initial transform
-        tensor=T.ToTensor()
-        sa=tensor(sample)
+        #tensor=T.ToTensor()
+        #sa=tensor(sample)
 
-        mean,std=sa.mean([1,2]),sa.std([1,2])
+        #mean,std=sa.mean([1,2]),sa.std([1,2])
 
         #Composed transform
-        composed_transforms=T.Compose([T.Resize(size=(128,128)),T.ToTensor(),T.Normalize(mean=mean,std=std)])
+        composed_transforms=T.Compose([T.CenterCrop(size=(256,256)),T.ToTensor()])
 
         sample=composed_transforms(sample)
 
