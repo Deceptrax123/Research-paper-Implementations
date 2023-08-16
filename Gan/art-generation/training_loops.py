@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from data_generator import Dataset
+from data_generator import AbstractArtDataset
 from discriminator import Discriminator
 from generator import Generator
 import numpy as np
@@ -79,9 +79,9 @@ def training_loop():
         glosses.append(train_losses[0])
 
         #save model at epoch checkpoints
-        if((epoch+1)%50==0):
+        if((epoch+1)%25==0):
             path='generator{number}.ptg'.format(number=epoch+1)
-            torch.save(generator.state_dict(),'generator.pth')
+            torch.save(generator.state_dict(),path)
 
 if __name__=='__main__':
     torch.multiprocessing.set_sharing_strategy('file_system')
@@ -94,12 +94,12 @@ if __name__=='__main__':
         'num_workers':4
     }
 
-    dataset=Dataset(ids)
+    dataset=AbstractArtDataset(ids)
 
     wandb.init(
         project="art-generation",
         config={
-            "learning_rate":0.002,
+            "learning_rate":0.0002,
             "architecture":"Adversarial",
             "dataset":"Art generation from kaggle",
             "Epochs":100,

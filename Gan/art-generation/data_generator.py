@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as T
 import numpy as np 
 
-class Dataset(torch.utils.data.Dataset):
+class AbstractArtDataset(torch.utils.data.Dataset):
     def __init__(self, list_ids):
         self.list_ids = list_ids
 
