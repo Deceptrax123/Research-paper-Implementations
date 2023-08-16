@@ -34,9 +34,11 @@ def train_step():
         discriminator.zero_grad()
         discriminator_predictions=discriminator(samples)
         discriminator_loss=loss_function(discriminator_predictions,labels)
-        discriminator_loss.backward(retain_graph=True)
+        discriminator_loss.backward()
         discriminator_optimizer.step()
 
+        latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
+        generated_samples=generator(latent_space_samples)
         #Training the generator
         generator.zero_grad()
         output_discriminator_generated=discriminator(generated_samples)
