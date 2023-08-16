@@ -11,6 +11,7 @@ from torch import nn
 from time import time
 import multiprocessing as mp
 import torch.multiprocessing
+import wandb
 
 def train_step():
     gen_loss=0
@@ -71,9 +72,16 @@ def training_loop():
         print("Generator Loss: {gloss}".format(gloss=train_losses[0]))
         print("Discriminator Loss: {dloss}".format(dloss=train_losses[1]))
 
+        wandb.log({'Generator Loss':train_losses[0],'Discriminator Loss':train_losses[1]})
+
+
         dlosses.append(train_losses[1])
         glosses.append(train_losses[0])
 
+        #save model at epoch checkpoints
+        if((epoch+1)%50==0):
+            path='generator{number}.ptg'.format(number=epoch+1)
+            torch.save(generator.state_dict(),'generator.pth')
 
 if __name__=='__main__':
     torch.multiprocessing.set_sharing_strategy('file_system')
@@ -87,6 +95,16 @@ if __name__=='__main__':
     }
 
     dataset=Dataset(ids)
+
+    wandb.init(
+        project="art-generation",
+        config={
+            "learning_rate":0.002,
+            "architecture":"Adversarial",
+            "dataset":"Art generation from kaggle",
+            "Epochs":100,
+        },
+    )
 
     train_loader=DataLoader(dataset,**params)
 
@@ -115,9 +133,6 @@ if __name__=='__main__':
     train_steps=(len(ids)+params['batch_size']-1)//params['batch_size']
 
     history=training_loop()
-
-    torch.save(generator.state_dict(),'generator.pth')
-    torch.save(discriminator.state_dict(),'discriminator.pth')
 
     #get ideal count of num_workers
     # for num_workers in range(2, mp.cpu_count()+2, 2):  
