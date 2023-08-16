@@ -4,11 +4,14 @@
 .AppleDouble
 .LSOverride
 
+#wandb
+wandb/
+
 # Icon must end with two \r
 Icon
 
 #overide data
-Data/
+Data
 .vscode/
 
 

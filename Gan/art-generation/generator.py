@@ -111,15 +111,8 @@ class Generator(Module):
         x=self.bn9(x)
         x=self.relu9(x)
 
+
         x=self.bot4(x)
-        x=self.bn10(x)
-        x=self.relu10(x)
-
-        x=self.bot5(x)
-        x=self.bn11(x)
-        x=self.relu11(x)
-
-        x=self.bot6(x)
         x=self.tanh(x)
 
         return x
@@ -139,5 +132,5 @@ class Generator(Module):
 #     return total_params
 
 
-#model = Generator()
-#summary(model,input_size=(100,),batch_size=8,device='cpu')
+# model = Generator()
+# summary(model,input_size=(100,),batch_size=8,device='cpu')
