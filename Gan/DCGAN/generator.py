@@ -40,35 +40,10 @@ class Generator(Module):
         self.relu4=ReLU()
 
         self.conv5=ConvTranspose2d(in_channels=64,out_channels=32,kernel_size=(4,4),stride=2,padding=1)
-        self.bn5=BatchNorm2d(num_features=32)
+        self.bn5=BatchNorm2d(32)
         self.relu5=ReLU()
 
-        self.conv6=ConvTranspose2d(in_channels=32,out_channels=3,kernel_size=(4,4),stride=2,padding=1)
-        self.bn6=BatchNorm2d(3)
-        self.relu6=ReLU()
-
-        #bottle neck convolutions
-        self.bot1=ConvTranspose2d(in_channels=3,out_channels=3,kernel_size=(3,3),stride=1,padding=1)
-        self.bn7=BatchNorm2d(3)
-        self.relu7=ReLU()
-
-        self.bot2=ConvTranspose2d(in_channels=3,out_channels=3,kernel_size=(3,3),stride=1,padding=1)
-        self.bn8=BatchNorm2d(3)
-        self.relu8=ReLU()
-
-        self.bot3=ConvTranspose2d(in_channels=3,out_channels=3,stride=1,padding=1,kernel_size=(3,3))
-        self.bn9=BatchNorm2d(3)
-        self.relu9=ReLU()
-
-        self.bot4=ConvTranspose2d(in_channels=3,out_channels=3,stride=1,padding=1,kernel_size=(3,3))
-        self.bn10=BatchNorm2d(3)
-        self.relu10=ReLU()
-
-        self.bot5=ConvTranspose2d(in_channels=3,out_channels=3,stride=1,padding=1,kernel_size=(3,3))
-        self.bn11=BatchNorm2d(3)
-        self.relu11=ReLU()
-
-        self.bot6=ConvTranspose2d(in_channels=3,out_channels=3,stride=1,padding=1,kernel_size=(3,3))
+        self.conv6=ConvTranspose2d(in_channels=32,out_channels=3,kernel_size=(4,4),padding=1,stride=2)
         self.tanh = Tanh()
 
     def forward(self, x):
@@ -96,23 +71,7 @@ class Generator(Module):
         x=self.relu5(x)
 
         x=self.conv6(x)
-        x=self.bn6(x)
-        x=self.relu6(x)
 
-        x=self.bot1(x)
-        x=self.bn7(x)
-        x=self.relu7(x)
-
-        x=self.bot2(x)
-        x=self.bn8(x)
-        x=self.relu8(x)
-
-        x=self.bot3(x)
-        x=self.bn9(x)
-        x=self.relu9(x)
-
-
-        x=self.bot4(x)
         x=self.tanh(x)
 
         return x
@@ -132,5 +91,5 @@ class Generator(Module):
 #     return total_params
 
 
-# model = Generator()
-# summary(model,input_size=(100,),batch_size=8,device='cpu')
+#model = Generator()
+#summary(model,input_size=(100,),batch_size=8,device='cpu')

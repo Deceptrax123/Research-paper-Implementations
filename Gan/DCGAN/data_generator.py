@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as T
 import numpy as np 
 
-class AbstractArtDataset(torch.utils.data.Dataset):
+class PokemonDataset(torch.utils.data.Dataset):
     def __init__(self, list_ids):
         self.list_ids = list_ids
 
@@ -16,16 +16,9 @@ class AbstractArtDataset(torch.utils.data.Dataset):
         id = self.list_ids[index]
 
         sample = Image.open(
-            "./Data/Abstract_gallery/Abstract_gallery/Abstract_image_"+str(id)+".jpg")
+            "./Data/pokemon_jpg/pokemon_jpg/img"+str(id)+".jpg")
 
-        #initial transform
-        #tensor=T.ToTensor()
-        #sa=tensor(sample)
-
-        #mean,std=sa.mean([1,2]),sa.std([1,2])
-
-        #Composed transform
-        composed_transforms=T.Compose([T.CenterCrop(size=(256,256)),T.ToTensor()])
+        composed_transforms=T.Compose([T.ToTensor()])
 
         sample=composed_transforms(sample)
 

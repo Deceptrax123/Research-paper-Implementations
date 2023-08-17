@@ -13,68 +13,68 @@ class Discriminator(Module):
 
         self.conv1=Conv2d(in_channels=3,out_channels=8,stride=2,kernel_size=(3,3),padding=1)
         self.bn1=BatchNorm2d(8)
-        self.dp1=Dropout2d(p=0.3)
+        self.dp1=Dropout2d(p=0.2)
         self.lr1=LeakyReLU(negative_slope=0.2)
 
         self.conv2=Conv2d(in_channels=8,out_channels=16,stride=2,kernel_size=(3,3),padding=1)
-        self.dp2=Dropout2d(p=0.3)
+        self.dp2=Dropout2d(p=0.2)
         self.bn2=BatchNorm2d(num_features=16)
         self.lr2=LeakyReLU(negative_slope=0.2)
 
         self.conv3=Conv2d(in_channels=16,out_channels=32,kernel_size=(3,3),stride=2,padding=1)
-        self.dp3=Dropout2d(p=0.3)
+        self.dp3=Dropout2d(p=0.2)
         self.bn3=BatchNorm2d(32)
         self.lr3=LeakyReLU(negative_slope=0.2)
 
         self.conv4=Conv2d(in_channels=32,out_channels=64,kernel_size=(3,3),stride=2,padding=1)
-        self.dp4=Dropout2d(p=0.3)
+        self.dp4=Dropout2d(p=0.2)
         self.bn4=BatchNorm2d(64)
         self.lr4=LeakyReLU(negative_slope=0.2)
 
-        self.conv5=Conv2d(in_channels=64,out_channels=32,kernel_size=(3,3),stride=2,padding=1)
-        self.dp5=Dropout2d(p=0.3)
-        self.bn5=BatchNorm2d(32)
+        self.conv5=Conv2d(in_channels=64,out_channels=128,kernel_size=(3,3),stride=2,padding=1)
+        self.dp5=Dropout2d(p=0.2)
+        self.bn5=BatchNorm2d(128)
         self.lr5=LeakyReLU(negative_slope=0.2)
 
-        self.conv6=Conv2d(in_channels=32,out_channels=16,kernel_size=(3,3),stride=2,padding=1)
-        self.dp6=Dropout2d(p=0.3)
-        self.bn6=BatchNorm2d(16)
+        self.conv6=Conv2d(in_channels=128,out_channels=256,kernel_size=(3,3),stride=2,padding=1)
+        self.dp6=Dropout2d(p=0.2)
+        self.bn6=BatchNorm2d(256)
         self.lr6=LeakyReLU(negative_slope=0.2)
 
         self.flatten=Flatten(start_dim=1)
-        self.linear=Linear(8*8*32,1)
+        self.linear=Linear(256*4*4,1)
 
     
     def forward(self,x):
         x=self.conv1(x)
         x=self.bn1(x)
-        x=self.dp1(x)
+        #x=self.dp1(x)
         x=self.lr1(x)
 
         x=self.conv2(x)
-        x=self.dp2(x)
+        #x=self.dp2(x)
         x=self.bn2(x)
         x=self.lr2(x)
 
         x=self.conv3(x)
-        x=self.dp3(x)
+        #x=self.dp3(x)
         x=self.bn3(x)
         x=self.lr3(x)
 
         x=self.conv4(x)
-        x=self.dp4(x)
+        #x=self.dp4(x)
         x=self.bn4(x)
         x=self.lr4(x)
 
         x=self.conv5(x)
-        x=self.dp5(x)
+        #x=self.dp5(x)
         x=self.bn5(x)
         x=self.lr5(x)
 
-        # x=self.conv6(x)
-        # x=self.dp6(x)
-        # x=self.bn6(x)
-        # x=self.lr6(x)
+        x=self.conv6(x)
+        #x=self.dp6(x)
+        x=self.bn6(x)
+        x=self.lr6(x)
 
         x=self.flatten(x)
         x=self.linear(x)
@@ -96,4 +96,4 @@ class Discriminator(Module):
 
 #model = Discriminator()
 # # # # # count_parameters(model)
-# summary(model,input_size=(3,256,256),batch_size=8,device='cpu')
+#summary(model,input_size=(3,256,256),batch_size=8,device='cpu')

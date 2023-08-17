@@ -1,11 +1,10 @@
 import torch
 from torch.utils.data import DataLoader
-from data_generator import AbstractArtDataset
+from data_generator import PokemonDataset
 from discriminator import Discriminator
 from generator import Generator
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from initialize import initialize_weights
 from torch import nn
 from time import time
@@ -27,19 +26,22 @@ def train_step():
         latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
 
-        #consider all samples
-        samples=torch.cat((real_samples,generated_samples))
-        labels=torch.cat((real_labels,generated_labels))
 
         #Train the discriminator
         discriminator.zero_grad()
-        discriminator_predictions=discriminator(samples)
-        discriminator_loss=loss_function(discriminator_predictions,labels)
+        out_gen_disc=discriminator(generated_samples)
+        out_real_disc=discriminator(real_samples)
+
+        gen_loss=loss_function(out_gen_disc,generated_labels)
+        dis_loss=loss_function(out_real_disc,real_labels)
+
+        discriminator_loss=(gen_loss+dis_loss)/2
         discriminator_loss.backward()
         discriminator_optimizer.step()
 
         latent_space_samples=torch.randn((real_samples.size(0),100)).to(device=device)
         generated_samples=generator(latent_space_samples)
+
         #Training the generator
         generator.zero_grad()
         output_discriminator_generated=discriminator(generated_samples)
@@ -56,52 +58,43 @@ def train_step():
     return gloss,dloss
 
 def training_loop():
-
-    glosses=[]
-    dlosses=[]
+    generator.train(True)
+    discriminator.train(True)
     for epoch in range(num_epochs):
-        generator.train(True)
-        discriminator.train(True)
-
+    
         train_losses=train_step()
 
-        generator.train(False)
-        discriminator.train(False) 
-        
         print('Epoch {epoch}'.format(epoch=epoch+1))
         print("Generator Loss: {gloss}".format(gloss=train_losses[0]))
         print("Discriminator Loss: {dloss}".format(dloss=train_losses[1]))
 
         wandb.log({'Generator Loss':train_losses[0],'Discriminator Loss':train_losses[1]})
 
-
-        dlosses.append(train_losses[1])
-        glosses.append(train_losses[0])
-
         #save model at epoch checkpoints
         if((epoch+1)%25==0):
-            path='generator{number}.pth'.format(number=epoch+1)
+            path='./models/generator{number}.pth'.format(number=epoch+1)
             torch.save(generator.state_dict(),path)
+    
 
 if __name__=='__main__':
     torch.multiprocessing.set_sharing_strategy('file_system')
     #initial setup
-    ids = list(range(0, 2782))
+    ids = list(range(1,820))
 
     params={
-        'batch_size':128,
+        'batch_size':32,
         'shuffle':True,
-        'num_workers':4
+        'num_workers':0
     }
 
-    dataset=AbstractArtDataset(ids)
+    dataset=PokemonDataset(ids)
 
     wandb.init(
         project="art-generation",
         config={
             "learning_rate":0.0002,
             "architecture":"Adversarial",
-            "dataset":"Art generation from kaggle",
+            "dataset":"Pokemon from kaggle",
             "Epochs":100,
         },
     )
@@ -121,7 +114,7 @@ if __name__=='__main__':
     initialize_weights(discriminator)
 
     #hyperparameters
-    lr=2e-4
+    lr=0.0002
     num_epochs=100
     loss_function=nn.BCEWithLogitsLoss()
 
@@ -132,7 +125,7 @@ if __name__=='__main__':
 
     train_steps=(len(ids)+params['batch_size']-1)//params['batch_size']
 
-    history=training_loop()
+    training_loop()
 
     #get ideal count of num_workers
     # for num_workers in range(2, mp.cpu_count()+2, 2):  
@@ -143,4 +136,3 @@ if __name__=='__main__':
     #             pass
     #     end = time()
     #     print("Finish with:{} second, num_workers={}".format(end - start, num_workers))
-
