@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from data_generator import PokemonDataset
+from data_generator import PokemonDataset,AbstractArtDataset
 from discriminator import Discriminator
 from generator import Generator
 import numpy as np
@@ -72,29 +72,32 @@ def training_loop():
 
         #save model at epoch checkpoints
         if((epoch+1)%25==0):
-            path='./models/generator{number}.pth'.format(number=epoch+1)
-            torch.save(generator.state_dict(),path)
+            pathgen='./models/abstract_art/generator{number}.pth'.format(number=epoch+1)
+            pathdis='./models/abstract_art/discriminator{number}.pth'.format(number=epoch+1)
+            torch.save(generator.state_dict(),pathgen)
+            torch.save(discriminator.state_dict(),pathdis)
     
 
 if __name__=='__main__':
     torch.multiprocessing.set_sharing_strategy('file_system')
     #initial setup
-    ids = list(range(1,820))
+    ids = list(range(0,1500))
 
     params={
-        'batch_size':32,
+        'batch_size':64,
         'shuffle':True,
         'num_workers':0
     }
 
-    dataset=PokemonDataset(ids)
+    #dataset=PokemonDataset(ids)
+    dataset=AbstractArtDataset(ids)
 
     wandb.init(
         project="art-generation",
         config={
             "learning_rate":0.0002,
             "architecture":"Adversarial",
-            "dataset":"Pokemon from kaggle",
+            "dataset":"Abstract art, Pokemon from kaggle",
             "Epochs":100,
         },
     )
@@ -115,7 +118,7 @@ if __name__=='__main__':
 
     #hyperparameters
     lr=0.0002
-    num_epochs=100
+    num_epochs=1000
     loss_function=nn.BCEWithLogitsLoss()
 
     #set optimizer
