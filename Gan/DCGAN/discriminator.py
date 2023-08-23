@@ -41,43 +41,41 @@ class Discriminator(Module):
         self.bn6=BatchNorm2d(256)
         self.lr6=LeakyReLU(negative_slope=0.2)
 
-        self.flatten=Flatten(start_dim=1)
-        self.linear=Linear(256*4*4,1)
+        self.conv7=Conv2d(in_channels=256,out_channels=1,kernel_size=(4,4),stride=1,padding=0)
 
     
     def forward(self,x):
         x=self.conv1(x)
         x=self.bn1(x)
-        #x=self.dp1(x)
+        x=self.dp1(x)
         x=self.lr1(x)
 
         x=self.conv2(x)
-        #x=self.dp2(x)
+        x=self.dp2(x)
         x=self.bn2(x)
         x=self.lr2(x)
 
         x=self.conv3(x)
-        #x=self.dp3(x)
+        x=self.dp3(x)
         x=self.bn3(x)
         x=self.lr3(x)
 
         x=self.conv4(x)
-        #x=self.dp4(x)
+        x=self.dp4(x)
         x=self.bn4(x)
         x=self.lr4(x)
 
         x=self.conv5(x)
-        #x=self.dp5(x)
+        x=self.dp5(x)
         x=self.bn5(x)
         x=self.lr5(x)
 
         x=self.conv6(x)
-        #x=self.dp6(x)
+        x=self.dp6(x)
         x=self.bn6(x)
         x=self.lr6(x)
 
-        x=self.flatten(x)
-        x=self.linear(x)
+        x=self.conv7(x)
 
         return x
 
@@ -96,4 +94,4 @@ class Discriminator(Module):
 
 #model = Discriminator()
 # # # # # count_parameters(model)
-#summary(model,input_size=(3,256,256),batch_size=8,device='cpu')
+#summary(model,input_size=(3,128,128),batch_size=8,device='cpu')
