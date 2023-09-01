@@ -1,4 +1,4 @@
-from torch.nn import Conv2d,MaxPool2d,Linear,BatchNorm2d,ReLU,Softmax
+from torch.nn import Conv2d,MaxPool2d,Linear,BatchNorm2d,ReLU,Softmax,BatchNorm1d
 from torch.nn import Module
 from torchsummary import summary
 from torch.nn.init import kaiming_normal_,xavier_normal_
@@ -89,12 +89,12 @@ class Fully_Connected(Module):
         super(Fully_Connected,self).__init__()
 
         self.ln1=Linear(in_features=in_f,out_features=out_f)
-        self.bn1=BatchNorm2d(out_f)
+        self.bn1=BatchNorm1d(out_f)
         self.relu1=ReLU()
 
         self.apply(self._init_weights)
     def _init_weights(self,module):
-         if isinstance(module,(Linear,BatchNorm2d)):
+         if isinstance(module,(Linear,BatchNorm1d)):
             if module.bias.data is not None:
                 module.bias.data.zero_()
             else:
@@ -119,7 +119,7 @@ class Classifer(Module):
                 module.bias.data.zero_()
             else:
                 xavier_normal_(module.weight.data)
-                
+
     def forward(self,x):
         x=self.ln(x)
         x=self.softmax(x)
